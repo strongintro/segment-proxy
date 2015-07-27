@@ -1,0 +1,40 @@
+{
+  "apiVersion": "v1",
+  "kind": "ReplicationController",
+  "metadata": {
+    "name": "segment-proxy"
+  },
+  "spec": {
+    "replicas": 1,
+    "selector": {
+      "name": "segment-proxy"
+    },
+    "template": {
+      "metadata": {
+        "labels": {
+          "name": "segment-proxy"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "segment-proxy",
+            "image": "gcr.io/gio-compute/segment-proxy:latest",
+            "ports": [
+              {
+                "name": "segment-http",
+                "containerPort": 4200
+              }
+            ],
+            "env": [
+              {
+                "name": "NODE_ENV",
+                "value": "staging"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

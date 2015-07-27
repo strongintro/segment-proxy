@@ -1,0 +1,3 @@
+# segment-proxy
+
+Proxies analytics info to providers like Segment, Mixpanel, etc...
