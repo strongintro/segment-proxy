@@ -20,8 +20,54 @@ if (process.env.NODE_ENV === 'staging') {
 router.get('/a/:segmentKey/a.js', function (req, res) {
   request('http://cdn.segment.com/analytics.js/v1/' + req.params.segmentKey + '/analytics.min.js')
     .pipe(replaceStream('api.segment.io', url))
+    .pipe(replaceStream('www.google-analytics.com/analytics.js', url + '/a/ga.js'))
     .pipe(replaceStream('cdn.mxpnl.com/libs/mixpanel-2-latest.min.js', url + '/a/m.js'))
     .pipe(res)
+})
+
+router.get('/a/ga.js', function (req, res) {
+  request('http://www.google-analytics.com/analytics.js')
+    .pipe(replaceStream('www.google-analytics.com', url))
+    .pipe(replaceStream('google-analytics.com', url))
+    .pipe(res)
+})
+
+router.get('/r/collect', function (req, res) {
+  request('https://www.google-analytics.com/r/collect', {
+    qs: req.query
+  })
+    .pipe(res)
+
+  res.__writeHead = res.writeHead
+  res.writeHead = function (status, reasonPhrase, headers) {
+    var host = 'http://localhost:3000'
+
+    if (process.env.NODE_ENV === 'staging') {
+      host = 'https://qa-search.genius.io'
+    }
+
+    res.header('Access-Control-Allow-Origin', host)
+    res.__writeHead(status, reasonPhrase, headers)
+  }
+})
+
+router.get('/collect', function (req, res) {
+  request('https://www.google-analytics.com/collect', {
+    qs: req.query
+  })
+    .pipe(res)
+
+  res.__writeHead = res.writeHead
+  res.writeHead = function (status, reasonPhrase, headers) {
+    var host = 'http://localhost:3000'
+
+    if (process.env.NODE_ENV === 'staging') {
+      host = 'https://qa-search.genius.io'
+    }
+
+    res.header('Access-Control-Allow-Origin', host)
+    res.__writeHead(status, reasonPhrase, headers)
+  }
 })
 
 router.get('/a/m.js', function (req, res) {
